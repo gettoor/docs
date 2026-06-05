@@ -1,0 +1,52 @@
+name: Build and deploy docs
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  docs:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout docs
+        uses: actions/checkout@v4
+        with:
+          path: docs
+
+      - name: Checkout engine
+        uses: actions/checkout@v4
+        with:
+          repository: gettoor/cli
+          path: docs/repos/engine
+
+      - name: Build engine API docs
+        working-directory: docs/repos/engine
+        run: |
+          npm run docs:api
+
+      - name: Copy engine API docs
+        working-directory: docs
+        run: |
+          cp -r docs/repos/engine/docs/api docs/engine/api
+
+      - name: Checkout CLI
+        uses: actions/checkout@v4
+        with:
+          repository: gettoor/cli
+          path: docs/repos/cli
+
+      - name: Copy CLI docs
+        working-directory: docs
+        run: |
+          cp -r docs/repos/cli/docs/cli docs/cli
+
+      - name: Install dependencies
+        working-directory: docs
+        run: npm ci
+
+      - name: Build docs
+        working-directory: docs
+        run: npm run docs:build
