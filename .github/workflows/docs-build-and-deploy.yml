@@ -25,6 +25,7 @@ jobs:
       - name: Build engine API docs
         working-directory: docs/repos/engine
         run: |
+          npm ci
           npm run docs:api
 
       - name: Copy engine API docs
